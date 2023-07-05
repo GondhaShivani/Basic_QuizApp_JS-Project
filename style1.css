@@ -94,6 +94,7 @@ hover effect is only work while button is not disabled. */
     text-align: center;
     margin: 10px auto 0;
     color:rgb(0, 0, 0);
-    background-color: gray;    padding: 10px;
+    background-color: rgb(159, 193, 113);    padding: 10px;
     border-radius: 4px;
-  }
+    border: 2px salmon;
+}
