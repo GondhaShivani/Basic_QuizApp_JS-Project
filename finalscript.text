@@ -23,8 +23,8 @@ const questions = [
         answer : [
             { text: "Kalahari", correct : false},
             { text: "Gobi", correct : false},
-            { text: "Sahara", correct : false},
-            { text: "Antarctica", correct : true},
+            { text: "Antarctica", correct : false},
+            { text: "Sahara", correct : true},
         ]
     },{
         question : "Which is the smallest country in the world?",
@@ -43,16 +43,51 @@ const nextButton = document.getElementById("next-btn");
 
 let currentQuestionIndex = 0;
 let score = 0;
+let timerValue = 15;
 
 function startQuiz(){
     currentQuestionIndex = 0;
-    score = 0;
+    score = 0;    
+
+    startTimer();
 
     // Update the innerHTML of the nextButton to "Next"
     nextButton.innerHTML = "Next";
 
     //functionCall to display the first question
     showQuestion();
+}
+
+function updateTimer() {
+    const timerElement = document.getElementById("timer");
+    if (timerValue > 0) {
+        timerElement.textContent = `Time Remaining: ${timerValue} seconds`;
+    } else {
+        timerElement.textContent = "Time's up!";
+    }
+}
+
+function startTimer() {
+    timerValue = 15;
+    updateTimer();
+    timerInterval = setInterval(decrementTimer, 1000);
+}
+
+function decrementTimer() {
+    timerValue--;
+    updateTimer();
+    if (timerValue === 0) {
+        clearInterval(timerInterval);
+        displayMessage("Time's up!");
+        showScore();
+    }
+}
+
+function displayMessage(message) {
+    const messageElement = document.createElement("p");
+    messageElement.textContent = message;
+    messageElement.classList.add("message");
+    answerButtons.appendChild(messageElement);
 }
 
 function showQuestion(){
@@ -66,7 +101,7 @@ function showQuestion(){
     let questionNo = currentQuestionIndex + 1;
 
     // Set the innerHTML of the questionElement to display the question number and text
-    questionElement.innerHTML = (`${questionNo}. ${currentQuestion.question}`);//change text from que goes here to 1. question(text) 
+    questionElement.textContent = (`${questionNo}. ${currentQuestion.question}`);//change text from que goes here to 1. question(text) 
 
 
     //Answer
@@ -76,7 +111,7 @@ function showQuestion(){
         // Create a button element for each answer
         const button = document.createElement("button");//create buttons
 
-        button.innerHTML = answer.text;//make options
+        button.textContent = answer.text;//make options
 
         // Add the "btn" class to the button for styling
         button.classList.add("btn");
@@ -107,10 +142,8 @@ function resetState(){
     }
 }
 
-
-
 //The function selectAnswer() is triggered when a user selects an answer option.
-function selectAnswer(e){
+function selectAnswer(e) {
     //selectedBtn represents the button element that the user clicked on to select their answer. 
     const selectedBtn = e.target;
 
@@ -135,20 +168,24 @@ function selectAnswer(e){
     nextButton.style.display= "block";
 }
 
-nextButton.addEventListener("click", ()=>{
+nextButton.addEventListener("click", () => {
+
     if(currentQuestionIndex < questions.length){
         handleNextButton();
     }
     else{
-        startQuiz(); //restart the quiz
+        showScore();
     }
 } );
 
 function handleNextButton(){
     currentQuestionIndex++;//nextQuestion
+    clearInterval(timerInterval);
 
     if(currentQuestionIndex < questions.length){
+        setTimeout(showQuestion, 1000);
         showQuestion();
+        startTimer();
     }
     else{
         showScore();
@@ -158,6 +195,8 @@ function handleNextButton(){
 
 function showScore(){
     resetState();
+    clearInterval(timerInterval);
+    updateTimer();
 
     switch (score) {
         case 4:
@@ -185,11 +224,19 @@ function showScore(){
         answerButtons.appendChild(greetings);
     }
 
+
     //instead of showing ques we have to show score so chnage innerHTML
     questionElement.innerHTML = `You Scored ${score} out of ${questions.length} !!`;
 
     nextButton.innerHTML = "Play Again...";
     nextButton.style.display = "block";
+
+    //if user click on play again then reset the state
+    nextButton.addEventListener("click", () => {
+        currentQuestionIndex = 0;
+        score = 0;
+        startQuiz();
+    } );
 }
 
 startQuiz();
